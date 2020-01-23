@@ -16,7 +16,7 @@ if [ -d build ]; then
 fi
 
 mkdir build # make build directory
-pushd build
+cd build
 
 # download tarballs
 echo "= downloading coreutils"
@@ -37,10 +37,10 @@ if [ "$platform" = "Linux" ]; then
 
   install_dir=${working_dir}/musl-install
 
-  pushd musl-${musl_version}
+  cd musl-${musl_version}
   env CFLAGS="$CFLAGS -Os -ffunction-sections -fdata-sections" LDFLAGS='-Wl,--gc-sections' ./configure --prefix=${install_dir}
   make install
-  popd # musl-${musl-version}
+  cd ..
 
   echo "= setting CC to musl-gcc"
   export CC=${working_dir}/musl-install/bin/musl-gcc
@@ -52,12 +52,12 @@ fi
 
 echo "= building coreutils"
 
-pushd coreutils-${coreutils_version}
+cd coreutils-${coreutils_version}
 env FORCE_UNSAFE_CONFIGURE=1 CFLAGS="$CFLAGS -Os -ffunction-sections -fdata-sections" LDFLAGS='-Wl,--gc-sections' ./configure
 make
-popd # coreutils-${coreutils_version}
+cd ..
 
-popd # build
+cd ..
 
 if [ ! -d releases ]; then
   mkdir releases

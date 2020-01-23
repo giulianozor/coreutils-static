@@ -3,4 +3,4 @@ WORKDIR /tmp
 RUN apk add make automake gcc musl-dev gcc bash git curl upx  && \
     git clone https://github.com/giulianozor/coreutils-static.git  && \
     cd coreutils-static && \
-    bash ./build.sh
+    bash -c ./build.sh
