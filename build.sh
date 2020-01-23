@@ -17,24 +17,24 @@ curl -LO http://ftp.gnu.org/gnu/coreutils/coreutils-${coreutils_version}.tar.xz
 echo "= extracting coreutils"
 tar xJf coreutils-${coreutils_version}.tar.xz
 
-echo "= downloading musl"
-curl -LO http://www.musl-libc.org/releases/musl-${musl_version}.tar.gz
+#echo "= downloading musl"
+#curl -LO http://www.musl-libc.org/releases/musl-${musl_version}.tar.gz
 
-echo "= extracting musl"
-tar -xf musl-${musl_version}.tar.gz
+#echo "= extracting musl"
+#tar -xf musl-${musl_version}.tar.gz
 
-echo "= building musl"
-working_dir=$(pwd)
+#echo "= building musl"
+#working_dir=$(pwd)
 
-install_dir=${working_dir}/musl-install
+#install_dir=${working_dir}/musl-install
 
-cd musl-${musl_version}
-env CFLAGS="$CFLAGS -Os -ffunction-sections -fdata-sections" LDFLAGS='-Wl,--gc-sections' ./configure --prefix=${install_dir}
-make install
-cd ..
+#cd musl-${musl_version}
+#env CFLAGS="$CFLAGS -Os -ffunction-sections -fdata-sections" LDFLAGS='-Wl,--gc-sections' ./configure --prefix=${install_dir}
+#make install
+#cd ..
 
 echo "= setting CC to musl-gcc"
-export CC=${working_dir}/musl-install/bin/musl-gcc
+#export CC=${working_dir}/musl-install/bin/musl-gcc
 export CFLAGS="-static"
 
 echo "= building coreutils"
