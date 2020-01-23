@@ -64,12 +64,11 @@ if [ ! -d releases ]; then
 fi
 
 echo "= striptease"
-strip -s -R .comment -R .gnu.version --strip-unneeded build/coreutils-${coreutils_version}/coreutils
+strip -s -R .comment -R .gnu.version --strip-unneeded build/coreutils-${coreutils_version}/src/*
 echo "= compressing"
 
 shopt -s extglob
-for file in build/coreutils-${coreutils_version}/src/!(*.*)
-do
+for file in build/coreutils-${coreutils_version}/src/!(*.*);do
 	upx --ultra-brute $file
 done
 echo "= extracting coreutils binary"
