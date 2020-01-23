@@ -10,14 +10,6 @@ musl_version="1.1.24"
 
 platform=$(uname -s)
 
-if [ -d build ]; then
-  echo "= removing previous build directory"
-  rm -rf build
-fi
-
-mkdir build # make build directory
-cd build
-
 # download tarballs
 echo "= downloading coreutils"
 curl -LO http://ftp.gnu.org/gnu/coreutils/coreutils-${coreutils_version}.tar.xz
@@ -25,30 +17,25 @@ curl -LO http://ftp.gnu.org/gnu/coreutils/coreutils-${coreutils_version}.tar.xz
 echo "= extracting coreutils"
 tar xJf coreutils-${coreutils_version}.tar.xz
 
-if [ "$platform" = "Linux" ]; then
-  echo "= downloading musl"
-  curl -LO http://www.musl-libc.org/releases/musl-${musl_version}.tar.gz
+echo "= downloading musl"
+curl -LO http://www.musl-libc.org/releases/musl-${musl_version}.tar.gz
 
-  echo "= extracting musl"
-  tar -xf musl-${musl_version}.tar.gz
+echo "= extracting musl"
+tar -xf musl-${musl_version}.tar.gz
 
-  echo "= building musl"
-  working_dir=$(pwd)
+echo "= building musl"
+working_dir=$(pwd)
 
-  install_dir=${working_dir}/musl-install
+install_dir=${working_dir}/musl-install
 
-  cd musl-${musl_version}
-  env CFLAGS="$CFLAGS -Os -ffunction-sections -fdata-sections" LDFLAGS='-Wl,--gc-sections' ./configure --prefix=${install_dir}
-  make install
-  cd ..
+cd musl-${musl_version}
+env CFLAGS="$CFLAGS -Os -ffunction-sections -fdata-sections" LDFLAGS='-Wl,--gc-sections' ./configure --prefix=${install_dir}
+make install
+cd ..
 
-  echo "= setting CC to musl-gcc"
-  export CC=${working_dir}/musl-install/bin/musl-gcc
-  export CFLAGS="-static"
-else
-  echo "= WARNING: your platform does not support static binaries."
-  echo "= (This is mainly due to non-static libc availability.)"
-fi
+echo "= setting CC to musl-gcc"
+export CC=${working_dir}/musl-install/bin/musl-gcc
+export CFLAGS="-static"
 
 echo "= building coreutils"
 
@@ -57,20 +44,10 @@ env FORCE_UNSAFE_CONFIGURE=1 CFLAGS="$CFLAGS -Os -ffunction-sections -fdata-sect
 make
 cd ..
 
-cd ..
+mkdir releases
 
-if [ ! -d releases ]; then
-  mkdir releases
-fi
+find coreutils-${coreutils_version}/src/ -executable -type f -exec strip -s -R .comment -R .gnu.version --strip-unneeded {} \; 
+find coreutils-${coreutils_version}/src/ -executable -type f -exec upx --ultra-brute {} \; 
+find coreutils-${coreutils_version}/src/ -executable -type f -exec cp {} release \;
 
-echo "= striptease"
-strip -s -R .comment -R .gnu.version --strip-unneeded build/coreutils-${coreutils_version}/src/*
-echo "= compressing"
-
-shopt -s extglob
-for file in build/coreutils-${coreutils_version}/src/!(*.*);do
-	upx --ultra-brute $file
-done
-echo "= extracting coreutils binary"
-cp build/coreutils-${coreutils_version}/src/!(*.*) releases
 echo "= done"
